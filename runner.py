@@ -192,10 +192,11 @@ def main():
                                 clicked_pice= None
                                 player_key *= -1
                             #break
-
+                    pice_hit = False
                     for sq_wp in occupied_squares: 
                         if sq_wp.rect.collidepoint(position):
                             clicked_pice = sq_wp.occupied_by
+                            pice_hit = True
                             Player = Players[player_key]
                             if clicked_pice in globals()[f"{Player}_pices"]:
                                 #print('pice pressed')
@@ -209,6 +210,8 @@ def main():
                                         
                             else:
                                 clicked_pice = None
+                    if not pice_hit:
+                        clicked_pice = None
                         #else:
                         #    clicked_pice = None
                     
