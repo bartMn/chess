@@ -3,6 +3,7 @@ import temporary_pices
 import os
 import classes
 import engine
+import time
 
 # Define constants for the screen width and height
 SCREEN_WIDTH = 800
@@ -99,7 +100,15 @@ def create_pices(FEN_input, path_to_read_pices, Game):
                 creator_key= ord(char) + 32
 
             #p= globals()[pices_dict[creator_key]](color, path_to_read_pices, sqare_id)
-            eng_pice = Game.create_a_pice(pices_dict[creator_key], color, sqare_id)
+            eng_pice = Game.create_a_pice(pice = pices_dict[creator_key],
+                                          color = color,
+                                          gui_position = sqare_id,
+                                          white_army = Game.white_army, 
+                                          white_king = Game.white_king,
+                                          black_army = Game.black_army,
+                                          black_king = Game.black_king,
+                                          board = Game.board 
+                                          )
             #print(eng_pice)
             p= classes.Pice(color, path_to_read_pices, sqare_id, pices_dict[creator_key], eng_pice)
             board_sqares[sqare_id].occupied_by = p
@@ -111,16 +120,16 @@ def create_pices(FEN_input, path_to_read_pices, Game):
 
         
 def move_a_pice(pice, new_position):
-    print(len(occupied_squares))
+    #print(len(occupied_squares))
     occupied_squares.remove(board_sqares[pice.sqare_id])
-    print(len(occupied_squares))
+    #print(len(occupied_squares))
     if board_sqares[new_position] in occupied_squares:
         board_sqares[new_position].occupied_by.kill()
-
     pice.make_a_move(new_position)
     occupied_squares.add(board_sqares[new_position])
     board_sqares[new_position].occupied_by = pice
     #print(len(Game.white_army))
+
 
 def promote_a_pawn(pawn, path, eng_obj):
 
@@ -147,9 +156,51 @@ def main():
     Players = {1: "white", -1: "black"}
     player_key = 1
     Player = Players[player_key]
+    ai_turn = False
     
     while running:
         
+        if ai_turn:
+            
+            action = Game.minimax(board=Game.board, moves=Game.Moves, depth_max= 2, depth_current_depth= 0)
+            pice, move = action
+            
+            #board = Game.result(board, move)
+            ai_turn = False
+            R, F = move[0], move[1]
+            gui_move = R*8+F
+            
+            clicked_pice = None
+            R_current, F_current = pice.position[0], pice.position[1]
+            gui_current_position = R_current*8+F_current
+            for p in all_pices:
+                if p.sqare_id == gui_current_position:
+                    clicked_pice = p
+                    
+            if len(move)> 2:
+                R, F = move[2], move[3]
+                gui_move_1 = R*8+F
+                if move[1]> 4:
+                    pos_f = 7
+                else:
+                    pos_f = 0
+                pos_r = int(clicked_pice.sqare_id/8)
+                gui_id = pos_r*8+ pos_f
+                move_a_pice(board_sqares[gui_id].occupied_by, gui_move_1)
+                board_sqares[gui_current_position].change_color(squares_cliced, BLUE)
+                
+            move_a_pice(clicked_pice, gui_move)
+            board_sqares[gui_current_position].change_color(squares_cliced, BLUE)
+                
+            if Game.move_a_pice(clicked_pice.pice_type,
+                                move, Game.board):
+                temp = Game.board[int(clicked_pice.sqare_id/8)][clicked_pice.sqare_id- int(clicked_pice.sqare_id/8)*8]
+                promote_a_pawn(clicked_pice, path_to_read_pices, temp)
+            
+            player_key *= -1
+            clicked_pice = None 
+            
+                    
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 # If the Esc key is pressed, then exit the main loop
@@ -180,16 +231,36 @@ def main():
                     #print(clicked_pice)
                     if clicked_pice:
                         #print("1231231")
-                        for move in clicked_pice.pm(Game.board):
+                        for move in Game.return_legal_moves_for_a_pice(clicked_pice.pice_type, Game.board, Game.Moves):
                             #print(move)
-                            if board_sqares[move].rect.collidepoint(position):
+                            R, F = move[0], move[1]
+                            gui_move = R*8+F
+                            
+                            #gui_move = clicked_pice.pice_type.convert_moves_for_GUI(move[:2])
+                            if board_sqares[gui_move].rect.collidepoint(position):
                                 previous_position = clicked_pice.sqare_id
-                                move_a_pice(clicked_pice, move)
-                                if Game.move_a_pice(clicked_pice, move, previous_position):
+                                
+                                if len(move)> 2:
+                                    R, F = move[2], move[3]
+                                    gui_move_1 = R*8+F
+                                    if move[1]> 4:
+                                        pos_f = 7
+                                    else:
+                                        pos_f = 0
+                                    pos_r = int(clicked_pice.sqare_id/8)
+                                    gui_id = pos_r*8+ pos_f
+                                    move_a_pice(board_sqares[gui_id].occupied_by, gui_move_1)
+                                    board_sqares[gui_id].change_color(squares_cliced)
+                                move_a_pice(clicked_pice, gui_move)
+                                
+                                    
+                                if Game.move_a_pice(clicked_pice.pice_type,
+                                                    move, Game.board):
                                     temp = Game.board[int(clicked_pice.sqare_id/8)][clicked_pice.sqare_id- int(clicked_pice.sqare_id/8)*8]
                                     promote_a_pawn(clicked_pice, path_to_read_pices, temp)
                                 
                                 clicked_pice= None
+                                ai_turn = True
                                 player_key *= -1
                             #break
                     pice_hit = False
@@ -202,7 +273,11 @@ def main():
                                 #print('pice pressed')
                                 sq_wp.change_color(squares_cliced, BLUE)
                                 #print(sq_wp.occupied_by.pm(Game.board))
-                                for move in sq_wp.occupied_by.pm(Game.board):
+                                for move in Game.return_legal_moves_for_a_pice(sq_wp.occupied_by.pice_type, Game.board, Game.Moves):
+                                #sq_wp.occupied_by.pice_type.find_moves(Game.board):
+                                    move = sq_wp.occupied_by.pice_type.convert_moves_for_GUI(move)
+                                    #if move not in Game.return_legal_moves():
+                                    #    continue
                                     if board_sqares[move].color == (153, 76, 0):
                                         board_sqares[move].change_color(squares_cliced, DARK_RED)
                                     else:
@@ -213,8 +288,7 @@ def main():
                     if not pice_hit:
                         clicked_pice = None
                         #else:
-                        #    clicked_pice = None
-                    
+                        #    clicked_pice = None     
         
         for square in all_squares:
             screen.blit(square.surf, square.rect)
@@ -229,7 +303,7 @@ def main():
             board_sqares[e.ID].surf.blit(e.text, e.location)
 
         pygame.display.flip()
-        clock.tick(30)
+        #clock.tick(30)
 
     temporary_pices.delete_all_images()
 
