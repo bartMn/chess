@@ -1,3 +1,6 @@
+#this program cointains classes used by GUI
+#the code is responsible for creating visual objects
+
 import pygame
 import os
 from pygame.locals import (
@@ -13,6 +16,8 @@ BOARD_WIDTH= 700
 pygame.init()
 font = pygame.font.Font('freesansbold.ttf', 20)
 
+#class of objects showing coordinates of the board
+#they are put on top of board's squares
 class Coordinates(pygame.sprite.Sprite):
      def __init__(self, location, ID, char, color):
         super(Coordinates, self).__init__()
@@ -20,7 +25,7 @@ class Coordinates(pygame.sprite.Sprite):
         self.location = location
         self.ID = ID
 
-
+#class used to create and control squares of the chess board
 class Square(pygame.sprite.Sprite):
     def __init__(self, color, size, position_x, position_y, ID, occupied_by = None):
         super(Square, self).__init__()
@@ -49,14 +54,19 @@ class Square(pygame.sprite.Sprite):
         self.is_pressed = False
         self.occupied_by = occupied_by
 
+    #function used to change square's color to show legal moves
     def change_color(self, Squares_cliced, col = None):
         if not self.is_pressed:
             #self.surf.fill(self.color)
             #self.surf.fill((0,0,255))
-            self.new_square= Square((None, col), self.size, 0, 0, self.ID)
-            self.surf.blit(self.new_square.surf, self.new_square.rect)
-            Squares_cliced.add(self)
-            self.is_pressed = not self.is_pressed
+            try:
+                self.new_square= Square((None, col), self.size, 0, 0, self.ID)
+                self.surf.blit(self.new_square.surf, self.new_square.rect)
+                Squares_cliced.add(self)
+                self.is_pressed = not self.is_pressed
+            except:
+                self.surf.fill(self.color)
+                
         elif self.new_square:
             #self.surf.fill((0,0,255))
             Squares_cliced.remove(self)
@@ -87,7 +97,9 @@ class Pice(pygame.sprite.Sprite):
     def make_a_move(self, new_position):
         self.sqare_id = new_position
 
+"""
     def pm(self, board):
         self.pice_type.find_moves(board)
         #print(self.pice_type.moves)
         return self.pice_type.convert_moves_for_GUI()
+"""
