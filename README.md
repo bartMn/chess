@@ -1,4 +1,26 @@
-The project is in an early stage. Currently it is possible to move all pices, capture enemy pices and promote a pawn to a queen (it is planned to add a choice but in majority a pawn is promoted to a queen, so currently it is not necessary). However, the following rules have not been done yet: castling, en passsant, checks, check mate and stalemate.
-After all rules are implemented it is planned to make an AI for chess.
+The project is currently under development.
+Most of the chess rules have been implemented. There is a possipility to play against an AI player but the quiality of the moves played is very low. Moreover, it takes quite a lot of time to calculate which move should be made.
+It is planned to imlement the missing chess rule (en passant), optimise the minimax player and try different methods for an AI player and compare there performances.
 
-To make the program run, please add folder "pices" to the same repository. The folder contains two folders: "set0" (it contains patterns of pices) and "temp" (it is empty and when the program runs, balck and white pices are stored there. When the program terminates, items in the folder are deleted).
+
+Updates done to the project:
+1. castling (both sides and checking if castling is legal, i.e. kink is not attacked and squares between the king and a rook are not attacked)
+2. checks and checkmate (the checkmate is when a team has no legal moves and king is attacked)
+3. stalemate (when there are no legal moves and king is not attacked)
+4. AI/minimax player (currently the depth is set to 2 and it is very slow (about 25 seconds for a move))
+
+
+To do:
+1. Optimize minimax to enable increasing the depth (in theory depth can be increased but it will take a lot of time for the AI player to make a move)
+2. Show the common openings to the AI/minimax to follow them to not waste a time for calculations for the first moves
+3. Implement the en passant move
+4. Add a choice for a pawn promotion instead of promoting to a queen
+5. Try implementing different methods for an AI player
+
+
+Requirements:
+1. everyting that is in the branch
+2. pygame (python library)
+3. cv2 (python library)
+4. numpy (python library)
+5. copy (python library)
