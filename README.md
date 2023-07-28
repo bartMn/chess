@@ -17,8 +17,8 @@ To do:
 4. Add a choice for a pawn promotion instead of promoting to a queen
 5. Try implementing different methods for an AI player
 6. Add a draw when:
-   neither player has material to checkmate
-   there is a repetition (one position occours 3 times)
+   neither player has material to checkmate or
+   there is a repetition (one position occours 3 times) or
    there were 50 moves with no pawn or no capture
 7. Add comments in the code and remove redundant lines
 
