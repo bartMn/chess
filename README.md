@@ -16,6 +16,11 @@ To do:
 3. Implement the en passant move
 4. Add a choice for a pawn promotion instead of promoting to a queen
 5. Try implementing different methods for an AI player
+6. Add a draw when:
+   neither player has material to checkmate
+   there is a repetition (one position occours 3 times)
+   there were 50 moves with no pawn or no capture
+7. Add comments in the code and remove redundant lines
 
 
 Requirements:
